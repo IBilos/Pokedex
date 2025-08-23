@@ -1,0 +1,30 @@
+export interface PokemonListItem {
+  name: string;
+  url: string;
+}
+
+export interface PokemonType {
+  type: {
+    name: string;
+    url: string;
+  };
+}
+
+export interface PokemonStat {
+  base_stat: number;
+  stat: {
+    name: string;
+  };
+}
+
+export interface PokemonDetails {
+  name: string;
+  sprites: {
+    front_default: string;
+  };
+  types: PokemonType[];
+  stats: PokemonStat[];
+  id: number;
+  height: number;
+  weight: number;
+}

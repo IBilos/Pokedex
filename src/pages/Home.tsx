@@ -1,67 +1,99 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import './Home.scss'; // import your SCSS file
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-type Pokemon = {
-  name: string;
-  url: string;
-  image: string;
-};
+import { useEffect, useRef, useState } from 'react';
+import './Home.scss';
+import { useInfinitePokemon } from '../hooks/usePokemon';
+import { useVirtualizer } from '@tanstack/react-virtual';
 
 export default function Home() {
-  const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { pokemons, isLoading, isError, error, fetchNextPage, hasNextPage } =
+    useInfinitePokemon(20);
 
+  const parentRef = useRef<HTMLDivElement | null>(null);
+  const [columns, setColumns] = useState(2);
+
+  //Added for updating of columns on resize
   useEffect(() => {
-    async function fetchPokemons() {
-      try {
-        setLoading(true);
+    const updateColumns = () => {
+      const width = parentRef.current?.clientWidth || window.innerWidth;
+      if (width < 640) setColumns(2);
+      else if (width < 1024) setColumns(3);
+      else if (width < 1280) setColumns(4);
+      else setColumns(5);
+    };
 
-        // Get list of 20 Pokémon
-        const res = await axios.get(`${API_BASE_URL}/pokemon?limit=20`);
-        const results = res.data.results;
-
-        // For each Pokémon, fetch its details to get image
-        const detailedPokemons = await Promise.all(
-          results.map(async (pokemon: { name: string; url: string }) => {
-            const details = await axios.get(pokemon.url);
-            return {
-              name: pokemon.name,
-              url: pokemon.url,
-              image: details.data.sprites.front_default,
-            };
-          }),
-        );
-
-        setPokemons(detailedPokemons);
-      } catch (error) {
-        console.error('Error fetching Pokémon:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchPokemons();
+    updateColumns();
+    window.addEventListener('resize', updateColumns);
+    return () => window.removeEventListener('resize', updateColumns);
   }, []);
+
+  const rows = Math.ceil(pokemons.length / columns);
+  const rowVirtualizer = useVirtualizer({
+    count: rows,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 180,
+    overscan: 5,
+  });
+
+  //Infinite scroll detection
+  useEffect(() => {
+    const parent = parentRef.current;
+    if (!parent) return;
+    const handleScroll = () => {
+      const scrollBotom = parent.scrollTop + parent.clientHeight;
+      if (scrollBotom >= parent.scrollHeight - 500 && hasNextPage) {
+        fetchNextPage();
+      }
+    };
+
+    parent.addEventListener('scroll', handleScroll);
+    return () => parent.removeEventListener('scroll', handleScroll);
+  }, [hasNextPage, fetchNextPage]);
 
   return (
     <div className="home">
       <h1 className="title">Pokédex</h1>
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <div className="pokemon-grid">
-          {pokemons.map((pokemon) => (
-            <div key={pokemon.name} className="pokemon-card">
-              <img src={pokemon.image} alt={pokemon.name} />
-              <p>{pokemon.name}</p>
-            </div>
-          ))}
+      {isError && <p>{error?.message || 'Something went wrong'}</p>}
+
+      <div className="pokemon-grid-container" ref={parentRef}>
+        <div
+          style={{
+            height: rowVirtualizer.getTotalSize(),
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const start = virtualRow.index * columns;
+            const end = start + columns;
+            const rowPokemons = pokemons.slice(start, end);
+
+            return (
+              <div
+                key={virtualRow.index}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(${columns}, 1fr)`,
+                  gap: '1.5rem',
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+              >
+                {rowPokemons.map((p) => (
+                  <div key={p.id} className="pokemon-card">
+                    <img src={p.sprites.front_default} alt={p.name} />
+                    <p>{p.name}</p>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
         </div>
-      )}
+
+        {isLoading && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Loading...</p>}
+      </div>
     </div>
   );
 }

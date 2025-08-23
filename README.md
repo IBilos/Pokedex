@@ -12,6 +12,10 @@ A web application for exploring the Pokémon world, featuring advanced filtering
 - **Vite** (build tool)
 - **Sass** (styling)
 - **ESLint & Prettier** (code quality and formatting)
+- **Axios** – for HTTP requests to the PokeAPI
+- **React Query** – data fetching, caching, background updates, and infinite loading
+- **Virtualization** – rendering only visible items for performance in large lists
+- **Infinite Scroll** – automatic loading of Pokémon as the user scrolls
 - **PokeAPI** ([https://pokeapi.co/api/v2/](https://pokeapi.co/api/v2/))
 
 ---

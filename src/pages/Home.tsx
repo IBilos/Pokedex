@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import './Home.scss';
 import { useInfinitePokemon } from '../hooks/usePokemon';
 import { useVirtualizer } from '@tanstack/react-virtual';
@@ -8,44 +8,33 @@ export default function Home() {
     useInfinitePokemon(20);
 
   const parentRef = useRef<HTMLDivElement | null>(null);
-  const [columns, setColumns] = useState(2);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  //Added for updating of columns on resize
-  useEffect(() => {
-    const updateColumns = () => {
-      const width = parentRef.current?.clientWidth || window.innerWidth;
-      if (width < 640) setColumns(2);
-      else if (width < 1024) setColumns(3);
-      else if (width < 1280) setColumns(4);
-      else setColumns(5);
-    };
-
-    updateColumns();
-    window.addEventListener('resize', updateColumns);
-    return () => window.removeEventListener('resize', updateColumns);
-  }, []);
-
-  const rows = Math.ceil(pokemons.length / columns);
   const rowVirtualizer = useVirtualizer({
-    count: rows,
+    count: Math.ceil(pokemons.length / 5),
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 180,
+    estimateSize: () => 200,
     overscan: 5,
   });
 
-  //Infinite scroll detection
   useEffect(() => {
-    const parent = parentRef.current;
-    if (!parent) return;
-    const handleScroll = () => {
-      const scrollBotom = parent.scrollTop + parent.clientHeight;
-      if (scrollBotom >= parent.scrollHeight - 500 && hasNextPage) {
-        fetchNextPage();
-      }
+    if (!hasNextPage) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      {
+        root: parentRef.current,
+        rootMargin: '200px',
+      },
+    );
+    const el = loadMoreRef.current;
+    if (el) observer.observe(el);
+    return () => {
+      if (el) observer.unobserve(el);
     };
-
-    parent.addEventListener('scroll', handleScroll);
-    return () => parent.removeEventListener('scroll', handleScroll);
   }, [hasNextPage, fetchNextPage]);
 
   return (
@@ -63,21 +52,20 @@ export default function Home() {
           }}
         >
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-            const start = virtualRow.index * columns;
-            const end = start + columns;
+            const start = virtualRow.index * 5;
+            const end = start + 5;
             const rowPokemons = pokemons.slice(start, end);
 
             return (
               <div
                 key={virtualRow.index}
+                className="pokemon-grid"
                 style={{
                   position: 'absolute',
                   top: 0,
                   left: 0,
                   width: '100%',
                   display: 'grid',
-                  gridTemplateColumns: `repeat(${columns}, 1fr)`,
-                  gap: '1.5rem',
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
               >
@@ -91,6 +79,9 @@ export default function Home() {
             );
           })}
         </div>
+
+        {/* Sentinel for infinite scroll */}
+        <div ref={loadMoreRef} style={{ height: '1px' }} />
 
         {isLoading && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Loading...</p>}
       </div>

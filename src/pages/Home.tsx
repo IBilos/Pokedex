@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import './Home.scss';
 import { useInfinitePokemon } from '../hooks/usePokemon';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { useColumns } from '../hooks/useColumns';
 
 export default function Home() {
   const { pokemons, isLoading, isError, error, fetchNextPage, hasNextPage } =
@@ -9,6 +10,8 @@ export default function Home() {
 
   const parentRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  const columns = useColumns(parentRef);
 
   const rowVirtualizer = useVirtualizer({
     count: Math.ceil(pokemons.length / 5),
@@ -52,8 +55,8 @@ export default function Home() {
           }}
         >
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-            const start = virtualRow.index * 5;
-            const end = start + 5;
+            const start = virtualRow.index * columns;
+            const end = start + columns;
             const rowPokemons = pokemons.slice(start, end);
 
             return (

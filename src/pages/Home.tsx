@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import './Home.scss';
-import { useInfinitePokemon } from '../hooks/usePokemon';
+import { useInfinitePokemon } from '../hooks/useInfinitePokemon';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useColumns } from '../hooks/useColumns';
 

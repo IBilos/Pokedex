@@ -28,3 +28,10 @@ export interface PokemonDetails {
   height: number;
   weight: number;
 }
+
+export interface PokemonGridProps {
+  pokemons: PokemonDetails[];
+  fetchNextPage: () => void;
+  hasNextPage: boolean;
+  isLoading: boolean;
+}

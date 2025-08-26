@@ -7,8 +7,14 @@ import PokemonGrid from '../components/pokemon/grid/PokemonGrid';
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [search, setSearch] = useState('');
   const { pokemons, isLoading, isError, error, fetchNextPage, hasNextPage } =
     useInfinitePokemon(20);
+
+  //Filtering pokemons by search string
+  const filteredPokemons = pokemons.filter((p) =>
+    p.name.toLowerCase().includes(search.toLowerCase()),
+  );
 
   return (
     <div className="home">
@@ -20,9 +26,9 @@ export default function Home() {
       {isError && <p>{error?.message || 'Something went wrong'}</p>}
 
       <div className="content">
-        <Sidebar isOpen={isSidebarOpen} />
+        <Sidebar isOpen={isSidebarOpen} search={search} onSearchChange={setSearch} />
         <PokemonGrid
-          pokemons={pokemons}
+          pokemons={filteredPokemons}
           fetchNextPage={fetchNextPage}
           hasNextPage={hasNextPage}
           isLoading={isLoading}

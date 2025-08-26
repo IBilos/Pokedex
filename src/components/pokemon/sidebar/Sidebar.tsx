@@ -1,14 +1,19 @@
 import './Sidebar.scss';
 import type { SidebarProps } from '../../../types/props';
 
-export default function Sidebar({ isOpen }: SidebarProps) {
+export default function Sidebar({ isOpen, search, onSearchChange }: SidebarProps) {
   return (
     <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <h2>Filter & Sort</h2>
 
       <div className="filter-section">
         <label>Search by name</label>
-        <input type="text" placeholder="Pikachu..." />
+        <input
+          type="text"
+          placeholder="Pikachu..."
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
       </div>
 
       <div className="filter-section">

@@ -5,4 +5,6 @@ export interface HeaderProps {
 
 export interface SidebarProps {
   isOpen: boolean;
+  search: string;
+  onSearchChange: (value: string) => void;
 }

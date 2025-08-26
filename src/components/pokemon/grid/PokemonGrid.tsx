@@ -5,6 +5,7 @@ import type { PokemonDetails, PokemonGridProps } from '../../../types/pokemon';
 import './PokemonGrid.scss';
 import PokemonCard from '../card/PokemonCard';
 import PokemonModal from '../modal/PokemonModal';
+import EmptyState from '../../ui/emptyState/EmptyState';
 
 export default function PokemonGrid({
   pokemons,
@@ -77,6 +78,10 @@ export default function PokemonGrid({
       </div>
 
       <div ref={loadMoreRef} style={{ height: '1px' }} />
+
+      {!isLoading && pokemons.length === 0 && (
+        <EmptyState message="No Pokémon found." imageSrc="/assets/sad-pikachu.png" />
+      )}
 
       {isLoading && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Loading...</p>}
 

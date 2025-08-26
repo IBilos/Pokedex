@@ -8,3 +8,8 @@ export interface SidebarProps {
   search: string;
   onSearchChange: (value: string) => void;
 }
+
+export interface EmptyStateProps {
+  message?: string;
+  imageSrc?: string;
+}

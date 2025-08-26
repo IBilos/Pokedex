@@ -6,6 +6,7 @@ import './PokemonGrid.scss';
 import PokemonCard from '../card/PokemonCard';
 import PokemonModal from '../modal/PokemonModal';
 import EmptyState from '../../ui/emptyState/EmptyState';
+import Loader from '../../ui/loader/Loader';
 
 export default function PokemonGrid({
   pokemons,
@@ -83,7 +84,7 @@ export default function PokemonGrid({
         <EmptyState message="No Pokémon found." imageSrc="/assets/sad-pikachu.png" />
       )}
 
-      {isLoading && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Loading...</p>}
+      {isLoading && <Loader />}
 
       <PokemonModal pokemon={selectedPokemon} onClose={() => setSelectedPokemon(null)} />
     </main>

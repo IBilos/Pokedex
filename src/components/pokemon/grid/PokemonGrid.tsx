@@ -20,7 +20,7 @@ export default function PokemonGrid({
   const [selectedPokemon, setSelectedPokemon] = useState<PokemonDetails | null>(null);
 
   const rowVirtualizer = useVirtualizer({
-    count: Math.ceil(pokemons.length / 5),
+    count: Math.ceil(pokemons.length / columns),
     getScrollElement: () => parentRef.current,
     estimateSize: () => 200,
     overscan: 5,

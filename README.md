@@ -69,7 +69,7 @@ npm install
 npm run dev
 ```
 
-4. **(Optional) Linter:**
+4. **Linter:**
 
 ```bash
 npm run lint

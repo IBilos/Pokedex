@@ -35,3 +35,13 @@ export interface PokemonGridProps {
   hasNextPage: boolean;
   isLoading: boolean;
 }
+
+export interface PokemonCardProps {
+  pokemon: PokemonDetails;
+  onClick: (pokemon: PokemonDetails) => void;
+}
+
+export interface PokemonModalProps {
+  pokemon: PokemonDetails | null;
+  onClose: () => void;
+}

@@ -3,7 +3,7 @@ import './Home.scss';
 import { useInfinitePokemon } from '../hooks/useInfinitePokemon';
 import Header from '../components/pokemon/header/Header';
 import Sidebar from '../components/pokemon/sidebar/Sidebar';
-import PokemonGrid from '../components/pokemon/pokemonGrid/PokemonGrid';
+import PokemonGrid from '../components/pokemon/grid/PokemonGrid';
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

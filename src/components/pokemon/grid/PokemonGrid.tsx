@@ -1,8 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useColumns } from '../../../hooks/useColumns';
-import type { PokemonGridProps } from '../../../types/pokemon';
+import type { PokemonDetails, PokemonGridProps } from '../../../types/pokemon';
 import './PokemonGrid.scss';
+import PokemonCard from '../card/PokemonCard';
+import PokemonModal from '../modal/PokemonModal';
 
 export default function PokemonGrid({
   pokemons,
@@ -14,6 +16,8 @@ export default function PokemonGrid({
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const columns = useColumns(parentRef);
+
+  const [selectedPokemon, setSelectedPokemon] = useState<PokemonDetails | null>(null);
 
   const rowVirtualizer = useVirtualizer({
     count: Math.ceil(pokemons.length / 5),
@@ -61,10 +65,11 @@ export default function PokemonGrid({
               }}
             >
               {rowPokemons.map((p) => (
-                <div key={p.id} className="pokemon-card">
-                  <img src={p.sprites.front_default} alt={p.name} />
-                  <p>{p.name}</p>
-                </div>
+                <PokemonCard
+                  key={p.id}
+                  pokemon={p}
+                  onClick={(pokemon) => setSelectedPokemon(pokemon)}
+                />
               ))}
             </div>
           );
@@ -72,7 +77,10 @@ export default function PokemonGrid({
       </div>
 
       <div ref={loadMoreRef} style={{ height: '1px' }} />
+
       {isLoading && <p style={{ textAlign: 'center', marginTop: '1rem' }}>Loading...</p>}
+
+      <PokemonModal pokemon={selectedPokemon} onClose={() => setSelectedPokemon(null)} />
     </main>
   );
 }

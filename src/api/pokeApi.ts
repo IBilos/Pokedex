@@ -36,3 +36,13 @@ export const fetchPokemonsByGeneration = async (generation: string): Promise<Pok
     url: p.url,
   }));
 };
+
+export const fetchPokemonAbilities = async (): Promise<{ name: string; url: string }[]> => {
+  const response = await axios.get(`${API_BASE_URL}/ability`);
+  return response.data.results;
+};
+
+export const fetchPokemonsByAbility = async (ability: string): Promise<PokemonListItem[]> => {
+  const response = await axios.get(`${API_BASE_URL}/ability/${ability}`);
+  return response.data.pokemon.map((p: any) => p.pokemon);
+};

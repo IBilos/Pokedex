@@ -7,14 +7,22 @@ export interface SidebarProps {
   isOpen: boolean;
   search: string;
   onSearchChange: (value: string) => void;
+
   types?: { name: string; url: string }[];
-  isTypesLoading?: boolean;
-  selectedType: string | null;
-  onTypeChange: (value: string | null) => void;
   generations?: { name: string; url: string }[];
+  abilities?: { name: string; url: string }[];
+
+  isTypesLoading?: boolean;
   isGenerationsLoading?: boolean;
-  selectedGeneration: string | null;
-  onGenerationChange: (value: string | null) => void;
+  isAbilitiesLoading?: boolean;
+
+  selectedTypes: string[];
+  selectedGenerations: string[];
+  selectedAbilities: string[];
+
+  onTypeChange: (values: string[]) => void;
+  onGenerationChange: (values: string[]) => void;
+  onAbilityChange: (values: string[]) => void;
 }
 
 export interface EmptyStateProps {
@@ -25,7 +33,8 @@ export interface EmptyStateProps {
 export interface Options {
   limit?: number;
   search?: string;
-  type?: string | null;
-  generation?: string | null;
+  types?: string[];
+  generations?: string[];
+  abilities?: string[];
   enabled?: boolean;
 }

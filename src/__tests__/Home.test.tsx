@@ -4,19 +4,26 @@ import { mockPokemonList, mockPokemonDetails } from './mocks/pokemonMocks';
 import * as pokeApi from '../api/pokeApi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// Mock the API module
 jest.mock('../api/pokeApi');
 
-const queryClient = new QueryClient();
-
 describe('Home Page', () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
+    queryClient = new QueryClient();
     jest.resetAllMocks();
   });
 
   it('displays Pokémon list', async () => {
-    (pokeApi.fetchPokemonList as jest.Mock).mockResolvedValue(mockPokemonList);
-    (pokeApi.fetchPokemonDetails as jest.Mock).mockImplementation((name: string) =>
+    const mockedFetchPokemonList = pokeApi.fetchPokemonList as jest.MockedFunction<
+      typeof pokeApi.fetchPokemonList
+    >;
+    const mockedFetchPokemonDetails = pokeApi.fetchPokemonDetails as jest.MockedFunction<
+      typeof pokeApi.fetchPokemonDetails
+    >;
+
+    mockedFetchPokemonList.mockResolvedValue(mockPokemonList);
+    mockedFetchPokemonDetails.mockImplementation((name: string) =>
       Promise.resolve(mockPokemonDetails[name]),
     );
 
@@ -26,7 +33,6 @@ describe('Home Page', () => {
       </QueryClientProvider>,
     );
 
-    // Wait for Pokémon names to appear
     await waitFor(() => {
       expect(screen.getByText('mew')).toBeInTheDocument();
       expect(screen.getByText('mewtwo')).toBeInTheDocument();
@@ -34,7 +40,10 @@ describe('Home Page', () => {
   });
 
   it('shows error toast when fetching fails', async () => {
-    (pokeApi.fetchPokemonList as jest.Mock).mockRejectedValue(new Error('Failed to fetch'));
+    const mockedFetchPokemonList = pokeApi.fetchPokemonList as jest.MockedFunction<
+      typeof pokeApi.fetchPokemonList
+    >;
+    mockedFetchPokemonList.mockRejectedValue(new Error('Failed to fetch'));
 
     render(
       <QueryClientProvider client={queryClient}>
@@ -42,7 +51,6 @@ describe('Home Page', () => {
       </QueryClientProvider>,
     );
 
-    // Wait for toast to appear
     await waitFor(() => {
       expect(screen.getByText(/failed to fetch/i)).toBeInTheDocument();
     });

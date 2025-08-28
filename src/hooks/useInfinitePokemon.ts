@@ -7,16 +7,20 @@ import type { Options } from '../types/props';
 export function useInfinitePokemon({
   limit = 50,
   search = '',
-  type = null,
-  generation = null,
+  types = [],
+  generations = [],
+  abilities = [],
   enabled = true,
 }: Options) {
   const queryClient = useQueryClient();
 
   const query = useInfiniteQuery({
-    queryKey: ['pokemons', 'infinite', limit, search, type, generation],
+    queryKey: ['pokemons', 'infinite', limit, search, types, generations, abilities],
     queryFn: async ({ pageParam = 0 }) => {
-      const filteredList = await getFilteredPokemonList({ type, generation, search }, queryClient);
+      const filteredList = await getFilteredPokemonList(
+        { types, generations, abilities, search },
+        queryClient,
+      );
 
       if (!filteredList.length) return { results: [], nextOffset: undefined };
 

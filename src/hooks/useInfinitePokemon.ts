@@ -1,31 +1,45 @@
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchPokemonDetails } from '../api/pokeApi';
-import { usePokemonList } from './usePokemonList';
+import { getFilteredPokemonList } from '../utils/getFilteredPokemonList';
 import type { PokemonDetails } from '../types/pokemon';
+import type { Options } from '../types/props';
 
-export function useInfinitePokemon(limit = 50, search = '') {
+export function useInfinitePokemon({
+  limit = 50,
+  search = '',
+  type = null,
+  generation = null,
+  enabled = true,
+}: Options) {
   const queryClient = useQueryClient();
-  const { data: masterList, isLoading: isListLoading } = usePokemonList();
-
-  const filteredList =
-    masterList?.filter((p) => p.name.toLowerCase().includes(search.toLowerCase())) || [];
 
   const query = useInfiniteQuery({
-    queryKey: ['pokemons', 'infinite', limit, search],
+    queryKey: ['pokemons', 'infinite', limit, search, type, generation],
     queryFn: async ({ pageParam = 0 }) => {
+      const filteredList = await getFilteredPokemonList({ type, generation, search }, queryClient);
+
       if (!filteredList.length) return { results: [], nextOffset: undefined };
 
       const slice = filteredList.slice(pageParam, pageParam + limit);
 
-      const detailed: PokemonDetails[] = await Promise.all(
+      const detailedWithNulls = await Promise.all(
         slice.map(async (p) => {
-          const cached = queryClient.getQueryData<PokemonDetails>(['pokemon', p.name]);
-          if (cached) return cached;
+          try {
+            const cached = queryClient.getQueryData<PokemonDetails>(['pokemon', p.name]);
+            if (cached) return cached;
 
-          const data = fetchPokemonDetails(p.name);
-          queryClient.setQueryData(['pokemon', p.name], data);
-          return data;
+            const data = await fetchPokemonDetails(p.name);
+            queryClient.setQueryData(['pokemon', p.name], data);
+            return data;
+          } catch (err) {
+            console.log(err);
+            return null;
+          }
         }),
+      );
+
+      const detailed: PokemonDetails[] = detailedWithNulls.filter(
+        (p): p is PokemonDetails => p !== null,
       );
 
       const nextOffset = pageParam + limit < filteredList.length ? pageParam + limit : undefined;
@@ -36,12 +50,12 @@ export function useInfinitePokemon(limit = 50, search = '') {
     initialPageParam: 0,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
-    enabled: !!masterList,
+    enabled: enabled,
   });
 
   return {
     pokemons: query.data?.pages.flatMap((p) => p.results) || [],
-    isLoading: isListLoading || query.isLoading,
+    isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
     fetchNextPage: query.fetchNextPage,

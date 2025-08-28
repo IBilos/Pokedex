@@ -13,3 +13,26 @@ export const fetchPokemonDetails = async (name: string): Promise<PokemonDetails>
   const response = await axios.get(`${API_BASE_URL}/pokemon/${name}`);
   return response.data;
 };
+
+export const fetchPokemonTypes = async (): Promise<{ name: string; url: string }[]> => {
+  const response = await axios.get(`${API_BASE_URL}/type`);
+  return response.data.results;
+};
+
+export const fetchPokemonsByType = async (type: string): Promise<PokemonListItem[]> => {
+  const response = await axios.get(`${API_BASE_URL}/type/${type}`);
+  return response.data.pokemon.map((p: any) => p.pokemon);
+};
+
+export const fetchPokemonGenerations = async (): Promise<{ name: string; url: string }[]> => {
+  const response = await axios.get(`${API_BASE_URL}/generation`);
+  return response.data.results;
+};
+
+export const fetchPokemonsByGeneration = async (generation: string): Promise<PokemonListItem[]> => {
+  const response = await axios.get(`${API_BASE_URL}/generation/${generation}`);
+  return response.data.pokemon_species.map((p: any) => ({
+    name: p.name,
+    url: p.url,
+  }));
+};

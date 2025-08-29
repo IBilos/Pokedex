@@ -1,5 +1,6 @@
 import './StatSlider.scss';
 import type { StatSliderProps } from '../../../types/props';
+import { useEffect, useState } from 'react';
 
 export default function StatSlider({
   label,
@@ -9,23 +10,33 @@ export default function StatSlider({
   step = 1,
   onChange,
 }: StatSliderProps) {
-  const [minValue, maxValue] = values;
+  const [localValues, setLocalValues] = useState(values);
+  const [isDragging, setIsDragging] = useState(false);
+  const [minValue, maxValue] = localValues;
 
   // Keep values constrained
   const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = Math.min(Number(e.target.value), maxValue - step);
-    onChange([Math.max(min, v), maxValue]);
+    setLocalValues([Math.max(min, v), maxValue]);
   };
 
   const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = Math.max(Number(e.target.value), minValue + step);
-    onChange([minValue, Math.min(max, v)]);
+    setLocalValues([minValue, Math.min(max, v)]);
   };
+
+  const handleDragStart = () => setIsDragging(true);
+  const handleDragEnd = () => setIsDragging(false);
+
+  useEffect(() => {
+    if (!isDragging) {
+      onChange(localValues);
+    }
+  }, [isDragging, localValues, onChange]);
 
   const total = max - min;
   const clampedMin = Math.max(min, Math.min(minValue, max));
   const clampedMax = Math.max(min, Math.min(maxValue, max));
-
   const leftPercent = ((clampedMin - min) / total) * 100;
   const rangePercent = ((clampedMax - clampedMin) / total) * 100;
 
@@ -49,6 +60,10 @@ export default function StatSlider({
           step={step}
           value={minValue}
           onChange={handleMinChange}
+          onMouseDown={handleDragStart}
+          onMouseUp={handleDragEnd}
+          onTouchStart={handleDragStart}
+          onTouchEnd={handleDragEnd}
           aria-label={`${label ?? 'Range'} minimum`}
         />
 
@@ -61,6 +76,10 @@ export default function StatSlider({
           step={step}
           value={maxValue}
           onChange={handleMaxChange}
+          onMouseDown={handleDragStart}
+          onMouseUp={handleDragEnd}
+          onTouchStart={handleDragStart}
+          onTouchEnd={handleDragEnd}
           aria-label={`${label ?? 'Range'} maximum`}
         />
       </div>

@@ -73,3 +73,5 @@ export interface StatSliderProps {
   step?: number;
   onChange: (newRange: [number, number]) => void;
 }
+
+export interface PokemonFilters extends Options, StatRanges {}

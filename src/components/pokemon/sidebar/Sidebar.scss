@@ -5,11 +5,20 @@
   transition: width 0.3s ease, padding 0.3s ease;
   border-right: 1px solid #ddd;
   padding: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 
   &.open {
     width: 250px;
     padding: 1rem; 
     box-shadow: 2px 0 6px rgba(0,0,0,0.1);
+  }
+
+  .sidebar-content {
+    overflow-y: auto;
+    flex: 1; 
+    padding-right: 0.25rem; 
   }
 
   h2 {

@@ -2,20 +2,37 @@ import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchPokemonDetails } from '../api/pokeApi';
 import { getFilteredPokemonList } from '../utils/getFilteredPokemonList';
 import type { PokemonDetails } from '../types/pokemon';
-import type { Options } from '../types/props';
+import type { PokemonFilters } from '../types/props';
+import { filterByStats } from '../utils/filterByStats';
 
-export function useInfinitePokemon({
-  limit = 50,
-  search = '',
-  types = [],
-  generations = [],
-  abilities = [],
-  enabled = true,
-}: Options) {
+export function useInfinitePokemon(filters: PokemonFilters) {
+  const {
+    limit = 50,
+    search = '',
+    types = [],
+    generations = [],
+    abilities = [],
+    attackRange,
+    defenseRange,
+    speedRange,
+    enabled = true,
+  } = filters;
+
   const queryClient = useQueryClient();
 
   const query = useInfiniteQuery({
-    queryKey: ['pokemons', 'infinite', limit, search, types, generations, abilities],
+    queryKey: [
+      'pokemons',
+      'infinite',
+      limit,
+      search,
+      types,
+      generations,
+      abilities,
+      attackRange,
+      defenseRange,
+      speedRange,
+    ],
     queryFn: async ({ pageParam = 0 }) => {
       const filteredList = await getFilteredPokemonList(
         { types, generations, abilities, search },
@@ -24,31 +41,42 @@ export function useInfinitePokemon({
 
       if (!filteredList.length) return { results: [], nextOffset: undefined };
 
-      const slice = filteredList.slice(pageParam, pageParam + limit);
+      let results: PokemonDetails[] = [];
+      let offset = pageParam;
 
-      const detailedWithNulls = await Promise.all(
-        slice.map(async (p) => {
-          try {
-            const cached = queryClient.getQueryData<PokemonDetails>(['pokemon', p.name]);
-            if (cached) return cached;
+      while (results.length < limit && offset < filteredList.length) {
+        const slice = filteredList.slice(offset, offset + limit);
 
-            const data = await fetchPokemonDetails(p.name);
-            queryClient.setQueryData(['pokemon', p.name], data);
-            return data;
-          } catch (err) {
-            console.log(err);
-            return null;
-          }
-        }),
-      );
+        const detailedWithNulls = await Promise.all(
+          slice.map(async (p) => {
+            try {
+              const cached = queryClient.getQueryData<PokemonDetails>(['pokemon', p.name]);
+              if (cached) return cached;
 
-      const detailed: PokemonDetails[] = detailedWithNulls.filter(
-        (p): p is PokemonDetails => p !== null,
-      );
+              const data = await fetchPokemonDetails(p.name);
+              queryClient.setQueryData(['pokemon', p.name], data);
+              return data;
+            } catch (err) {
+              console.log(err);
+              return null;
+            }
+          }),
+        );
 
-      const nextOffset = pageParam + limit < filteredList.length ? pageParam + limit : undefined;
+        let detailed: PokemonDetails[] = detailedWithNulls.filter(
+          (p): p is PokemonDetails => p !== null,
+        );
 
-      return { results: detailed, nextOffset };
+        // Filter by stats
+        const filtered = filterByStats(detailed, { attackRange, defenseRange, speedRange });
+        results.push(...filtered);
+
+        offset += limit;
+      }
+
+      const nextOffset = offset < filteredList.length ? offset : undefined;
+
+      return { results, nextOffset };
     },
     getNextPageParam: (lastPage) => lastPage.nextOffset,
     initialPageParam: 0,

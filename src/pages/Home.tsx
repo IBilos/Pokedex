@@ -21,14 +21,6 @@ export default function Home() {
   const { data: generations, isLoading: isGenerationsLoading } = usePokemonGenerations();
   const { data: abilities, isLoading: isAbilitiesLoading } = usePokemonAbilities();
 
-  const { pokemons, isLoading, isError, error, fetchNextPage, hasNextPage } = useInfinitePokemon({
-    limit: 20,
-    search,
-    types: selectedTypes,
-    generations: selectedGenerations,
-    abilities: selectedAbilities,
-  });
-
   const [attackRange, setAttackRange] = useState<[number, number]>([
     STAT_LIMITS.attack[0],
     STAT_LIMITS.attack[1],
@@ -41,6 +33,17 @@ export default function Home() {
     STAT_LIMITS.speed[0],
     STAT_LIMITS.speed[1],
   ]);
+
+  const { pokemons, isLoading, isError, error, fetchNextPage, hasNextPage } = useInfinitePokemon({
+    limit: 20,
+    search,
+    types: selectedTypes,
+    generations: selectedGenerations,
+    abilities: selectedAbilities,
+    attackRange,
+    defenseRange,
+    speedRange,
+  });
 
   useEffect(() => {
     if (isError && error) {

@@ -52,7 +52,8 @@
       font-size: 0.9rem;
     }
 
-    input,
+    input[type="text"],
+    input[type="number"],
     select {
       width: 100%;
       max-width: 200px;

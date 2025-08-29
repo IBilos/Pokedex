@@ -64,14 +64,31 @@
     top: 100%;
     left: 0;
     right: 0;
-    max-height: 150px;
+    max-height: 200px;
     overflow-y: auto;
     border: 1px solid #ccc;
     border-radius: 8px;
     background-color: #fff;
     z-index: 10;
-    padding: 2px 0;
+    padding: 4px 0;
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+
+    .filter-input {
+      padding: 4px 8px;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: center;
+
+      input {
+        width: auto;
+        max-width: 90%;
+        padding: 4px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 0.85rem;
+        outline: none;
+      }
+    }
 
     .dropdown-item {
       display: flex;
@@ -84,6 +101,12 @@
         width: 14px;
         height: 14px;
       }
+    }
+
+    .no-results {
+      padding: 4px 8px;
+      font-size: 0.85rem;
+      color: #999;
     }
   }
 }

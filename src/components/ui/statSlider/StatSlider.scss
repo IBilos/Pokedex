@@ -1,0 +1,110 @@
+.stat-slider {
+  font-family: inherit;
+  width: 100%;
+  margin-bottom: 1rem;
+
+  &__label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+
+  &__container {
+    position: relative;
+    width: 100%;
+    height: 40px; /* give enough vertical space for thumbs */
+    display: flex;
+    align-items: center;
+  }
+
+  /* base track (gray) */
+  &__track {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: #e6e6e6;
+    border-radius: 999px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+  }
+
+  /* highlighted selected range */
+  &__highlight {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 6px;
+    background: #2b90ff; /* highlight color */
+    border-radius: 999px;
+    z-index: 2;
+  }
+
+  /* two overlapping native range inputs */
+  .stat-slider__range {
+    -webkit-appearance: none;
+    appearance: none;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 40px; /* fill container so thumb centers nicely */
+    margin: 0;
+    background: transparent;
+    pointer-events: none; /* disable the track area from capturing events; thumbs themselves will accept events */
+  }
+
+  /* WebKit thumb */
+  .stat-slider__range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    pointer-events: all; /* enable pointer events for the thumb */
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid #2b90ff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+    cursor: pointer;
+    margin-top: -7px; /* center thumb vertically relative to track */
+    position: relative;
+    z-index: 3;
+  }
+
+  /* Firefox thumb */
+  .stat-slider__range::-moz-range-thumb {
+    pointer-events: all;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid #2b90ff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+    cursor: pointer;
+    position: relative;
+    z-index: 3;
+  }
+
+  /* hide native track visuals (so only our custom track shows) */
+  .stat-slider__range::-webkit-slider-runnable-track {
+    background: transparent;
+    height: 6px;
+  }
+  .stat-slider__range::-moz-range-track {
+    background: transparent;
+    height: 6px;
+  }
+
+  /* optional: make one thumb visually above the other when overlapping */
+  .stat-slider__range--min::-webkit-slider-thumb { z-index: 4; }
+  .stat-slider__range--max::-webkit-slider-thumb { z-index: 3; }
+
+  /* values text */
+  &__values {
+    margin-top: 6px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #333;
+  }
+}

@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { usePokemonTypes } from '../hooks/usePokemonTypes';
 import { usePokemonGenerations } from '../hooks/usePokemonGenerations';
 import { usePokemonAbilities } from '../hooks/usePokemonAbilities';
+import { STAT_LIMITS } from '../utils/constants';
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -27,6 +28,19 @@ export default function Home() {
     generations: selectedGenerations,
     abilities: selectedAbilities,
   });
+
+  const [attackRange, setAttackRange] = useState<[number, number]>([
+    STAT_LIMITS.attack[0],
+    STAT_LIMITS.attack[1],
+  ]);
+  const [defenseRange, setDefenseRange] = useState<[number, number]>([
+    STAT_LIMITS.defense[0],
+    STAT_LIMITS.defense[1],
+  ]);
+  const [speedRange, setSpeedRange] = useState<[number, number]>([
+    STAT_LIMITS.speed[0],
+    STAT_LIMITS.speed[1],
+  ]);
 
   useEffect(() => {
     if (isError && error) {
@@ -58,6 +72,12 @@ export default function Home() {
           isAbilitiesLoading={isAbilitiesLoading}
           selectedAbilities={selectedAbilities}
           onAbilityChange={setSelectedAbilities}
+          attackRange={attackRange}
+          defenseRange={defenseRange}
+          speedRange={speedRange}
+          onAttackChange={setAttackRange}
+          onDefenseChange={setDefenseRange}
+          onSpeedChange={setSpeedRange}
         />
         <PokemonGrid
           pokemons={pokemons}

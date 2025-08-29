@@ -1,19 +1,7 @@
 // ScrollableCheckboxDropdown.tsx
 import { useState, useRef, useEffect } from 'react';
 import './ScrollableCheckboxDropdown.scss';
-
-interface Option {
-  label: string;
-  value: string;
-}
-
-interface Props {
-  options: Option[];
-  selected: string[];
-  onChange: (values: string[]) => void;
-  placeholder?: string;
-  disabled?: boolean;
-}
+import type { PropsScrollableCheckbox } from '../../../types/props';
 
 export default function ScrollableCheckboxDropdown({
   options,
@@ -21,9 +9,10 @@ export default function ScrollableCheckboxDropdown({
   onChange,
   placeholder = 'Select...',
   disabled = false,
-}: Props) {
+}: PropsScrollableCheckbox) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [filter, setFilter] = useState('');
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -48,11 +37,14 @@ export default function ScrollableCheckboxDropdown({
     onChange([]);
   };
 
+  const filteredOptions = options.filter((opt) =>
+    opt.label.toLowerCase().includes(filter.toLowerCase()),
+  );
+
   return (
     <div className={`checkbox-dropdown ${disabled ? 'disabled' : ''}`} ref={dropdownRef}>
       <div className="dropdown-header" onClick={() => !disabled && setIsOpen((prev) => !prev)}>
         <span>{selected.length ? selected.join(', ') : placeholder}</span>
-
         <div className="actions">
           {selected.length > 0 && (
             <button className="clear-btn" onClick={clearSelection}>
@@ -65,7 +57,17 @@ export default function ScrollableCheckboxDropdown({
 
       {isOpen && (
         <div className="dropdown-list">
-          {options.map((opt) => (
+          {/* Filter input inside dropdown */}
+          <div className="filter-input">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+          </div>
+
+          {filteredOptions.map((opt) => (
             <label key={opt.value} className="dropdown-item">
               <input
                 type="checkbox"
@@ -75,6 +77,8 @@ export default function ScrollableCheckboxDropdown({
               {opt.label.charAt(0).toUpperCase() + opt.label.slice(1)}
             </label>
           ))}
+
+          {filteredOptions.length === 0 && <div className="no-results">No options found</div>}
         </div>
       )}
     </div>

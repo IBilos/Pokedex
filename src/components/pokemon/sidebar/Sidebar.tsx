@@ -1,6 +1,8 @@
 import './Sidebar.scss';
 import type { SidebarProps } from '../../../types/props';
 import ScrollableCheckboxDropdown from '../../ui/scrollableCheckboxDropdown/ScrollableCheckboxDropdown';
+import StatSlider from '../../ui/statSlider/StatSlider';
+import { STAT_LIMITS } from '../../../utils/constants';
 
 export default function Sidebar({
   isOpen,
@@ -18,12 +20,21 @@ export default function Sidebar({
   onTypeChange,
   onGenerationChange,
   onAbilityChange,
+  attackRange,
+  defenseRange,
+  speedRange,
+  onAttackChange,
+  onDefenseChange,
+  onSpeedChange,
 }: SidebarProps) {
   const clearAllFilters = () => {
     onSearchChange('');
     onTypeChange([]);
     onGenerationChange([]);
     onAbilityChange([]);
+    onAttackChange([STAT_LIMITS.attack[0], STAT_LIMITS.attack[1]]);
+    onDefenseChange([STAT_LIMITS.defense[0], STAT_LIMITS.defense[1]]);
+    onSpeedChange([STAT_LIMITS.speed[0], STAT_LIMITS.speed[1]]);
   };
   return (
     <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
@@ -77,6 +88,37 @@ export default function Sidebar({
           onChange={onAbilityChange}
           placeholder="Select Abilities"
           disabled={isAbilitiesLoading}
+        />
+      </div>
+
+      {/* Stat Filters */}
+      <div className="filter-section">
+        <StatSlider
+          label="Attack"
+          min={STAT_LIMITS.attack[0]}
+          max={STAT_LIMITS.attack[1]}
+          values={attackRange ?? [STAT_LIMITS.attack[0], STAT_LIMITS.attack[1]]}
+          onChange={onAttackChange}
+        />
+      </div>
+
+      <div className="filter-section">
+        <StatSlider
+          label="Defense"
+          min={STAT_LIMITS.defense[0]}
+          max={STAT_LIMITS.defense[1]}
+          values={defenseRange ?? [STAT_LIMITS.defense[0], STAT_LIMITS.defense[1]]}
+          onChange={onDefenseChange}
+        />
+      </div>
+
+      <div className="filter-section">
+        <StatSlider
+          label="Speed"
+          min={STAT_LIMITS.speed[0]}
+          max={STAT_LIMITS.speed[1]}
+          values={speedRange ?? [STAT_LIMITS.speed[0], STAT_LIMITS.speed[1]]}
+          onChange={onSpeedChange}
         />
       </div>
 

@@ -23,6 +23,13 @@ export interface SidebarProps {
   onTypeChange: (values: string[]) => void;
   onGenerationChange: (values: string[]) => void;
   onAbilityChange: (values: string[]) => void;
+
+  attackRange: [number, number];
+  defenseRange: [number, number];
+  speedRange: [number, number];
+  onAttackChange: (range: [number, number]) => void;
+  onDefenseChange: (range: [number, number]) => void;
+  onSpeedChange: (range: [number, number]) => void;
 }
 
 export interface EmptyStateProps {
@@ -37,4 +44,32 @@ export interface Options {
   generations?: string[];
   abilities?: string[];
   enabled?: boolean;
+}
+
+export interface OptionScrollableCheckbox {
+  label: string;
+  value: string;
+}
+
+export interface PropsScrollableCheckbox {
+  options: OptionScrollableCheckbox[];
+  selected: string[];
+  onChange: (values: string[]) => void;
+  placeholder?: string;
+  disabled?: boolean;
+}
+
+export interface StatRanges {
+  attackRange?: [number, number];
+  defenseRange?: [number, number];
+  speedRange?: [number, number];
+}
+
+export interface StatSliderProps {
+  label: string;
+  min: number;
+  max: number;
+  values: [number, number];
+  step?: number;
+  onChange: (newRange: [number, number]) => void;
 }

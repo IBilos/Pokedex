@@ -27,6 +27,7 @@ export interface PokemonDetails {
   id: number;
   height: number;
   weight: number;
+  generation?: number;
 }
 
 export interface PokemonGridProps {

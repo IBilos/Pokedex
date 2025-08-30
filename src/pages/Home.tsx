@@ -10,6 +10,7 @@ import { usePokemonGenerations } from '../hooks/usePokemonGenerations';
 import { usePokemonAbilities } from '../hooks/usePokemonAbilities';
 import { STAT_LIMITS } from '../utils/constants';
 import type { SortCriteria } from '../types/pokemon';
+import { usePokemonToGenerationMap } from '../hooks/usePokemonToGenerationMap';
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -21,6 +22,7 @@ export default function Home() {
   const { data: types, isLoading: isTypesLoading } = usePokemonTypes();
   const { data: generations, isLoading: isGenerationsLoading } = usePokemonGenerations();
   const { data: abilities, isLoading: isAbilitiesLoading } = usePokemonAbilities();
+  const { data: pokemonToGeneration, isLoading: isGenMapLoading } = usePokemonToGenerationMap();
 
   const [attackRange, setAttackRange] = useState<[number, number]>([
     STAT_LIMITS.attack[0],
@@ -47,6 +49,7 @@ export default function Home() {
     defenseRange,
     speedRange,
     sortCriteria,
+    pokemonToGeneration,
   });
 
   useEffect(() => {
@@ -92,7 +95,7 @@ export default function Home() {
           pokemons={pokemons}
           fetchNextPage={fetchNextPage}
           hasNextPage={hasNextPage}
-          isLoading={isLoading}
+          isLoading={isLoading || isGenMapLoading}
         />
       </div>
     </div>

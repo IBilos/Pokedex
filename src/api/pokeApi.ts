@@ -47,3 +47,8 @@ export const fetchPokemonsByAbility = async (ability: string): Promise<PokemonLi
   const response = await axios.get(`${API_BASE_URL}/ability/${ability}`);
   return response.data.pokemon.map((p: any) => p.pokemon);
 };
+
+export const fetchPokemonSpecies = async (name: string) => {
+  const response = await axios.get(`${API_BASE_URL}/pokemon-species/${name}`);
+  return response.data;
+};

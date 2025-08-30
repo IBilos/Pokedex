@@ -21,6 +21,9 @@ export default function PokemonModal({ pokemon, onClose }: PokemonModalProps) {
         <p>
           <strong>Weight:</strong> {pokemon.weight}
         </p>
+        <p>
+          <strong>Generation:</strong> {pokemon.generation ?? 'Unknown'}
+        </p>
 
         <h3>Types:</h3>
         <ul>

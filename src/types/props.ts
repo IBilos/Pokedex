@@ -50,6 +50,7 @@ export interface Options {
   abilities?: string[];
   enabled?: boolean;
   sortCriteria: SortCriteria;
+  pokemonToGeneration?: Map<string, number>;
 }
 
 export interface OptionScrollableCheckbox {

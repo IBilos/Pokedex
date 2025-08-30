@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchPokemonDetails } from '../api/pokeApi';
+import { fetchPokemonDetails, fetchPokemonSpecies } from '../api/pokeApi';
 import { getFilteredPokemonList } from '../utils/getFilteredPokemonList';
 import type { PokemonDetails } from '../types/pokemon';
 import type { PokemonFilters } from '../types/props';
@@ -17,10 +17,12 @@ export function useInfinitePokemon(filters: PokemonFilters) {
     defenseRange,
     speedRange,
     sortCriteria,
+    pokemonToGeneration,
     enabled = true,
   } = filters;
 
   const queryClient = useQueryClient();
+  const speciesCache = new Map<string, any>();
 
   const query = useInfiniteQuery({
     queryKey: [
@@ -44,7 +46,7 @@ export function useInfinitePokemon(filters: PokemonFilters) {
 
       if (!filteredList.length) return { results: [], nextOffset: undefined };
 
-      const sortedList = sortPokemonList(filteredList, sortCriteria);
+      const sortedList = sortPokemonList(filteredList, sortCriteria, pokemonToGeneration);
 
       let results: PokemonDetails[] = [];
       let offset = pageParam;
@@ -59,8 +61,27 @@ export function useInfinitePokemon(filters: PokemonFilters) {
               if (cached) return cached;
 
               const data = await fetchPokemonDetails(p.name);
-              queryClient.setQueryData(['pokemon', p.name], data);
-              return data;
+              let generation = pokemonToGeneration?.get(p.name);
+
+              // Probably a variant of pokemon, fetch species to find base form
+              if (!generation) {
+                let speciesData = speciesCache.get(p.name);
+                if (!speciesData) {
+                  speciesData = await fetchPokemonSpecies(p.name);
+                  speciesCache.set(p.name, speciesData);
+                }
+
+                const defaultVariety = speciesData.varieties.find((v: any) => v.is_default);
+                const baseSpeciesName = defaultVariety
+                  ? defaultVariety.pokemon.name
+                  : speciesData.name;
+
+                generation = pokemonToGeneration?.get(baseSpeciesName) ?? 0;
+              }
+
+              const dataWithGeneration = { ...data, generation };
+              queryClient.setQueryData(['pokemon', p.name], dataWithGeneration);
+              return dataWithGeneration;
             } catch (err) {
               console.log(err);
               return null;

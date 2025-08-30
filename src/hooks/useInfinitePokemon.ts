@@ -4,6 +4,7 @@ import { getFilteredPokemonList } from '../utils/getFilteredPokemonList';
 import type { PokemonDetails } from '../types/pokemon';
 import type { PokemonFilters } from '../types/props';
 import { filterByStats } from '../utils/filterByStats';
+import { sortPokemonList } from '../utils/sortPokemonList';
 
 export function useInfinitePokemon(filters: PokemonFilters) {
   const {
@@ -15,6 +16,7 @@ export function useInfinitePokemon(filters: PokemonFilters) {
     attackRange,
     defenseRange,
     speedRange,
+    sortCriteria,
     enabled = true,
   } = filters;
 
@@ -32,6 +34,7 @@ export function useInfinitePokemon(filters: PokemonFilters) {
       attackRange,
       defenseRange,
       speedRange,
+      sortCriteria,
     ],
     queryFn: async ({ pageParam = 0 }) => {
       const filteredList = await getFilteredPokemonList(
@@ -41,11 +44,13 @@ export function useInfinitePokemon(filters: PokemonFilters) {
 
       if (!filteredList.length) return { results: [], nextOffset: undefined };
 
+      const sortedList = sortPokemonList(filteredList, sortCriteria);
+
       let results: PokemonDetails[] = [];
       let offset = pageParam;
 
-      while (results.length < limit && offset < filteredList.length) {
-        const slice = filteredList.slice(offset, offset + limit);
+      while (results.length < limit && offset < sortedList.length) {
+        const slice = sortedList.slice(offset, offset + limit);
 
         const detailedWithNulls = await Promise.all(
           slice.map(async (p) => {

@@ -45,3 +45,18 @@ export interface PokemonModalProps {
   pokemon: PokemonDetails | null;
   onClose: () => void;
 }
+
+export type SortCriteria =
+  | 'name-asc'
+  | 'name-desc'
+  | 'total-asc'
+  | 'total-desc'
+  | 'generation-asc'
+  | 'generation-desc'
+  | 'attack-asc'
+  | 'attack-desc'
+  | 'defense-asc'
+  | 'defense-desc'
+  | 'speed-asc'
+  | 'speed-desc'
+  | null;

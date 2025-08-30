@@ -9,6 +9,7 @@ import { usePokemonTypes } from '../hooks/usePokemonTypes';
 import { usePokemonGenerations } from '../hooks/usePokemonGenerations';
 import { usePokemonAbilities } from '../hooks/usePokemonAbilities';
 import { STAT_LIMITS } from '../utils/constants';
+import type { SortCriteria } from '../types/pokemon';
 
 export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -34,6 +35,8 @@ export default function Home() {
     STAT_LIMITS.speed[1],
   ]);
 
+  const [sortCriteria, setSortCriteria] = useState<SortCriteria>(null);
+
   const { pokemons, isLoading, isError, error, fetchNextPage, hasNextPage } = useInfinitePokemon({
     limit: 20,
     search,
@@ -43,6 +46,7 @@ export default function Home() {
     attackRange,
     defenseRange,
     speedRange,
+    sortCriteria,
   });
 
   useEffect(() => {
@@ -81,6 +85,8 @@ export default function Home() {
           onAttackChange={setAttackRange}
           onDefenseChange={setDefenseRange}
           onSpeedChange={setSpeedRange}
+          sortCriteria={sortCriteria}
+          onSortCriteriaChange={setSortCriteria}
         />
         <PokemonGrid
           pokemons={pokemons}

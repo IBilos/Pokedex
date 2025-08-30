@@ -1,3 +1,5 @@
+import type { SortCriteria } from './pokemon';
+
 export interface HeaderProps {
   isSidebarOpen: boolean;
   onToggleSidebar: () => void;
@@ -30,6 +32,9 @@ export interface SidebarProps {
   onAttackChange: (range: [number, number]) => void;
   onDefenseChange: (range: [number, number]) => void;
   onSpeedChange: (range: [number, number]) => void;
+
+  sortCriteria?: SortCriteria;
+  onSortCriteriaChange: (value: SortCriteria) => void;
 }
 
 export interface EmptyStateProps {
@@ -44,6 +49,7 @@ export interface Options {
   generations?: string[];
   abilities?: string[];
   enabled?: boolean;
+  sortCriteria: SortCriteria;
 }
 
 export interface OptionScrollableCheckbox {

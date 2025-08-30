@@ -3,6 +3,7 @@ import type { SidebarProps } from '../../../types/props';
 import ScrollableCheckboxDropdown from '../../ui/scrollableCheckboxDropdown/ScrollableCheckboxDropdown';
 import StatSlider from '../../ui/statSlider/StatSlider';
 import { STAT_LIMITS } from '../../../utils/constants';
+import SortDropdown from '../../ui/sortDropdown/SortDropdown';
 
 export default function Sidebar({
   isOpen,
@@ -26,6 +27,8 @@ export default function Sidebar({
   onAttackChange,
   onDefenseChange,
   onSpeedChange,
+  sortCriteria,
+  onSortCriteriaChange,
 }: SidebarProps) {
   const clearAllFilters = () => {
     onSearchChange('');
@@ -122,13 +125,8 @@ export default function Sidebar({
           />
         </div>
 
-        <div className="filter-section">
-          <label>Sort by</label>
-          <select>
-            <option value="name">Name</option>
-            <option value="power">Total Power</option>
-            <option value="generation">Generation</option>
-          </select>
+        <div className="filter-group">
+          <SortDropdown value={sortCriteria} onChange={onSortCriteriaChange} />
         </div>
       </div>
     </aside>

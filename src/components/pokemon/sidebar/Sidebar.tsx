@@ -38,6 +38,7 @@ export default function Sidebar({
     onAttackChange([STAT_LIMITS.attack[0], STAT_LIMITS.attack[1]]);
     onDefenseChange([STAT_LIMITS.defense[0], STAT_LIMITS.defense[1]]);
     onSpeedChange([STAT_LIMITS.speed[0], STAT_LIMITS.speed[1]]);
+    onSortCriteriaChange(null);
   };
   return (
     <aside className={`sidebar ${isOpen ? 'open' : ''}`}>

@@ -1,10 +1,9 @@
 import type { PokemonListItem } from '../types/pokemon';
 import type { SortCriteria } from '../types/pokemon';
 
-export function sortPokemonList(
+export function sortPokemonNameList(
   list: PokemonListItem[],
   criteria: SortCriteria | null,
-  pokemonToGeneration?: Map<string, number>,
 ): PokemonListItem[] {
   if (!criteria) return list;
 
@@ -14,14 +13,8 @@ export function sortPokemonList(
 
   switch (key) {
     case 'name':
+      console.log('Sorting by name', direction);
       return sorted.sort((a, b) => direction * a.name.localeCompare(b.name));
-    case 'generation':
-      if (!pokemonToGeneration) return list;
-      return sorted.sort(
-        (a, b) =>
-          direction *
-          ((pokemonToGeneration.get(a.name) ?? 0) - (pokemonToGeneration.get(b.name) ?? 0)),
-      );
     default:
       return list;
   }

@@ -1,10 +1,25 @@
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchPokemonDetails, fetchPokemonSpecies } from '../api/pokeApi';
 import { getFilteredPokemonList } from '../utils/getFilteredPokemonList';
 import type { PokemonDetails } from '../types/pokemon';
 import type { PokemonFilters } from '../types/props';
 import { filterByStats } from '../utils/filterByStats';
-import { sortPokemonList } from '../utils/sortPokemonList';
+import { sortPokemonNameList } from '../utils/sortPokemonNameList';
+import { sortPokemonListDetailed } from '../utils/sortPokemonListDetailed';
+import { fetchPokemonWithVariant } from '../utils/fetchPokemonWithVariant';
+
+const BATCH_SIZE = import.meta.env.VITE_BATCH_SIZE
+  ? parseInt(import.meta.env.VITE_BATCH_SIZE, 10)
+  : 50;
+
+function isStatOrGenerationSort(sortCriteria: string | null) {
+  return (
+    sortCriteria?.startsWith('attack') ||
+    sortCriteria?.startsWith('defense') ||
+    sortCriteria?.startsWith('speed') ||
+    sortCriteria?.startsWith('total') ||
+    sortCriteria?.startsWith('generation')
+  );
+}
 
 export function useInfinitePokemon(filters: PokemonFilters) {
   const {
@@ -46,7 +61,43 @@ export function useInfinitePokemon(filters: PokemonFilters) {
 
       if (!filteredList.length) return { results: [], nextOffset: undefined };
 
-      const sortedList = sortPokemonList(filteredList, sortCriteria, pokemonToGeneration);
+      //Stat || generation sort grana
+      if (isStatOrGenerationSort(sortCriteria)) {
+        console.log('Stat sort detected, fetching all details in batches...');
+        const allDetails: PokemonDetails[] = [];
+        for (let i = 0; i < filteredList.length; i += BATCH_SIZE) {
+          const batch = filteredList.slice(i, i + BATCH_SIZE);
+
+          const detailedBatch = await Promise.all(
+            batch.map(async (p) => {
+              try {
+                const cached = queryClient.getQueryData<PokemonDetails>(['pokemon', p.name]);
+                if (cached) return cached;
+
+                const dataWithGeneration = await fetchPokemonWithVariant(
+                  p.name,
+                  pokemonToGeneration,
+                  speciesCache,
+                );
+
+                queryClient.setQueryData(['pokemon', p.name], dataWithGeneration);
+                return dataWithGeneration;
+              } catch (err) {
+                console.error('Error fetching Pokémon:', p.name, err);
+                return null;
+              }
+            }),
+          );
+          allDetails.push(...detailedBatch.filter((p): p is PokemonDetails => p !== null));
+        }
+        const sorted = sortPokemonListDetailed(allDetails, sortCriteria);
+        const results = sorted.slice(pageParam, pageParam + limit);
+        const nextOffset = pageParam + limit < sorted.length ? pageParam + limit : undefined;
+
+        return { results, nextOffset };
+      }
+
+      const sortedList = sortPokemonNameList(filteredList, sortCriteria);
 
       let results: PokemonDetails[] = [];
       let offset = pageParam;
@@ -60,26 +111,12 @@ export function useInfinitePokemon(filters: PokemonFilters) {
               const cached = queryClient.getQueryData<PokemonDetails>(['pokemon', p.name]);
               if (cached) return cached;
 
-              const data = await fetchPokemonDetails(p.name);
-              let generation = pokemonToGeneration?.get(p.name);
+              const dataWithGeneration = await fetchPokemonWithVariant(
+                p.name,
+                pokemonToGeneration,
+                speciesCache,
+              );
 
-              // Probably a variant of pokemon, fetch species to find base form
-              if (!generation) {
-                let speciesData = speciesCache.get(p.name);
-                if (!speciesData) {
-                  speciesData = await fetchPokemonSpecies(p.name);
-                  speciesCache.set(p.name, speciesData);
-                }
-
-                const defaultVariety = speciesData.varieties.find((v: any) => v.is_default);
-                const baseSpeciesName = defaultVariety
-                  ? defaultVariety.pokemon.name
-                  : speciesData.name;
-
-                generation = pokemonToGeneration?.get(baseSpeciesName) ?? 0;
-              }
-
-              const dataWithGeneration = { ...data, generation };
               queryClient.setQueryData(['pokemon', p.name], dataWithGeneration);
               return dataWithGeneration;
             } catch (err) {

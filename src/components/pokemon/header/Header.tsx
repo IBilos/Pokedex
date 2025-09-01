@@ -6,7 +6,7 @@ export default function Header({ isSidebarOpen, onToggleSidebar }: HeaderProps) 
     <header className="header">
       <h1 className="title">Pokédex</h1>
       <button className="sidebar-toggle" onClick={onToggleSidebar}>
-        {isSidebarOpen ? 'Close' : 'Open'}
+        <span>{isSidebarOpen ? '×' : '≡'}</span>
       </button>
     </header>
   );

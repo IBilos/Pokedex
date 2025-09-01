@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useColumns } from '../../../hooks/useColumns';
 import type { PokemonDetails, PokemonGridProps } from '../../../types/pokemon';
@@ -21,12 +21,25 @@ export default function PokemonGrid({
 
   const [selectedPokemon, setSelectedPokemon] = useState<PokemonDetails | null>(null);
 
+  const getRowHeight = useCallback(() => {
+    if (window.innerWidth >= 1280) return 280 + 44;
+    if (window.innerWidth >= 1024) return 280 + 44;
+    if (window.innerWidth >= 640) return 280 + 14;
+    return 200 + 24;
+  }, []);
+
   const rowVirtualizer = useVirtualizer({
     count: Math.ceil(pokemons.length / columns),
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 200,
+    estimateSize: getRowHeight,
     overscan: 5,
   });
+
+  useEffect(() => {
+    const handleResize = () => rowVirtualizer.measure();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [rowVirtualizer]);
 
   // IntersectionObserver for infinite scroll
   useEffect(() => {

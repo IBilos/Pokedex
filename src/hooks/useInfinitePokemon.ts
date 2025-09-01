@@ -1,15 +1,9 @@
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { getFilteredPokemonList } from '../utils/getFilteredPokemonList';
-import type { PokemonDetails } from '../types/pokemon';
 import type { PokemonFilters } from '../types/props';
-import { filterByStats } from '../utils/filterByStats';
 import { sortPokemonNameList } from '../utils/sortPokemonNameList';
-import { sortPokemonListDetailed } from '../utils/sortPokemonListDetailed';
-import { fetchPokemonWithVariant } from '../utils/fetchPokemonWithVariant';
-
-const BATCH_SIZE = import.meta.env.VITE_BATCH_SIZE
-  ? parseInt(import.meta.env.VITE_BATCH_SIZE, 10)
-  : 50;
+import { fetchAllData } from '../utils/fetchAllData';
+import { fetchPartialData } from '../utils/fetchPartialData';
 
 function isStatOrGenerationSort(sortCriteria: string | null) {
   return (
@@ -61,85 +55,31 @@ export function useInfinitePokemon(filters: PokemonFilters) {
 
       if (!filteredList.length) return { results: [], nextOffset: undefined };
 
-      //Stat || generation sort grana
       if (isStatOrGenerationSort(sortCriteria)) {
-        console.log('Stat sort detected, fetching all details in batches...');
-        const allDetails: PokemonDetails[] = [];
-        for (let i = 0; i < filteredList.length; i += BATCH_SIZE) {
-          const batch = filteredList.slice(i, i + BATCH_SIZE);
-
-          const detailedBatch = await Promise.all(
-            batch.map(async (p) => {
-              try {
-                const cached = queryClient.getQueryData<PokemonDetails>(['pokemon', p.name]);
-                if (cached) return cached;
-
-                const dataWithGeneration = await fetchPokemonWithVariant(
-                  p.name,
-                  pokemonToGeneration,
-                  speciesCache,
-                );
-
-                queryClient.setQueryData(['pokemon', p.name], dataWithGeneration);
-                return dataWithGeneration;
-              } catch (err) {
-                console.error('Error fetching Pokémon:', p.name, err);
-                return null;
-              }
-            }),
-          );
-          allDetails.push(...detailedBatch.filter((p): p is PokemonDetails => p !== null));
-        }
-        const sorted = sortPokemonListDetailed(allDetails, sortCriteria);
-        const results = sorted.slice(pageParam, pageParam + limit);
-        const nextOffset = pageParam + limit < sorted.length ? pageParam + limit : undefined;
-
-        return { results, nextOffset };
+        return fetchAllData(
+          filteredList,
+          pageParam,
+          limit,
+          sortCriteria,
+          queryClient,
+          pokemonToGeneration,
+          speciesCache,
+        );
       }
 
       const sortedList = sortPokemonNameList(filteredList, sortCriteria);
 
-      let results: PokemonDetails[] = [];
-      let offset = pageParam;
-
-      while (results.length < limit && offset < sortedList.length) {
-        const slice = sortedList.slice(offset, offset + limit);
-
-        const detailedWithNulls = await Promise.all(
-          slice.map(async (p) => {
-            try {
-              const cached = queryClient.getQueryData<PokemonDetails>(['pokemon', p.name]);
-              if (cached) return cached;
-
-              const dataWithGeneration = await fetchPokemonWithVariant(
-                p.name,
-                pokemonToGeneration,
-                speciesCache,
-              );
-
-              queryClient.setQueryData(['pokemon', p.name], dataWithGeneration);
-              return dataWithGeneration;
-            } catch (err) {
-              console.log(err);
-              return null;
-            }
-          }),
-        );
-
-        let detailed: PokemonDetails[] = detailedWithNulls.filter(
-          (p): p is PokemonDetails => p !== null,
-        );
-
-        // Filter by stats
-        const filtered = filterByStats(detailed, { attackRange, defenseRange, speedRange });
-        results.push(...filtered);
-
-        offset += limit;
-      }
-
-      const nextOffset = offset < filteredList.length ? offset : undefined;
-
-      return { results, nextOffset };
+      return fetchPartialData(
+        sortedList,
+        pageParam,
+        limit,
+        queryClient,
+        pokemonToGeneration,
+        speciesCache,
+        attackRange,
+        defenseRange,
+        speedRange,
+      );
     },
     getNextPageParam: (lastPage) => lastPage.nextOffset,
     initialPageParam: 0,

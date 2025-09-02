@@ -13,12 +13,11 @@
   &__container {
     position: relative;
     width: 100%;
-    height: 40px; /* give enough vertical space for thumbs */
+    height: 40px;
     display: flex;
     align-items: center;
   }
 
-  /* base track (gray) */
   &__track {
     position: absolute;
     left: 0;
@@ -31,48 +30,44 @@
     z-index: 1;
   }
 
-  /* highlighted selected range */
   &__highlight {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     height: 6px;
-    background: #2b90ff; /* highlight color */
+    background: #2b90ff;
     border-radius: 999px;
     z-index: 2;
   }
 
-  /* two overlapping native range inputs */
   .stat-slider__range {
     -webkit-appearance: none;
     appearance: none;
     position: absolute;
     left: 0;
     width: 100%;
-    height: 40px; /* fill container so thumb centers nicely */
+    height: 40px;
     margin: 0;
     background: transparent;
-    pointer-events: none; /* disable the track area from capturing events; thumbs themselves will accept events */
+    pointer-events: none;
   }
 
-  /* WebKit thumb */
   .stat-slider__range::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    pointer-events: all; /* enable pointer events for the thumb */
+    pointer-events: all;
     width: 18px;
     height: 18px;
     border-radius: 50%;
     background: #ffffff;
     border: 3px solid #2b90ff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
     cursor: pointer;
-    margin-top: -7px; /* center thumb vertically relative to track */
+    margin-top: -7px;
     position: relative;
     z-index: 3;
   }
 
-  /* Firefox thumb */
   .stat-slider__range::-moz-range-thumb {
     pointer-events: all;
     width: 18px;
@@ -80,13 +75,12 @@
     border-radius: 50%;
     background: #ffffff;
     border: 3px solid #2b90ff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
     cursor: pointer;
     position: relative;
     z-index: 3;
   }
 
-  /* hide native track visuals (so only our custom track shows) */
   .stat-slider__range::-webkit-slider-runnable-track {
     background: transparent;
     height: 6px;
@@ -96,11 +90,13 @@
     height: 6px;
   }
 
-  /* optional: make one thumb visually above the other when overlapping */
-  .stat-slider__range--min::-webkit-slider-thumb { z-index: 4; }
-  .stat-slider__range--max::-webkit-slider-thumb { z-index: 3; }
+  .stat-slider__range--min::-webkit-slider-thumb {
+    z-index: 4;
+  }
+  .stat-slider__range--max::-webkit-slider-thumb {
+    z-index: 3;
+  }
 
-  /* values text */
   &__values {
     margin-top: 6px;
     text-align: center;

@@ -1,4 +1,4 @@
-@import '../../../styles/variables';
+@use '../../../styles/variables' as vars;
 
 .pokemon-card {
   height: 280px;
@@ -6,8 +6,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  background: $color-background;
-  border: 2px solid $color-border;
+  background: vars.$color-background;
+  border: 2px solid vars.$color-border;
   border-radius: 16px;
   padding: 1rem;
   cursor: pointer;
@@ -20,7 +20,7 @@
   &:hover {
     transform: translateY(-6px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    border-color: $color-border-dark;
+    border-color: vars.$color-border-dark;
   }
 
   .pokemon-image {
@@ -45,7 +45,7 @@
     font-weight: 700;
     text-transform: capitalize;
     margin-bottom: 0.5rem;
-    color: #222;
+    color: vars.$color-text;
     text-align: center;
   }
 
@@ -63,7 +63,7 @@
       color: #fff;
     }
 
-    @each $type, $color in $type-colors {
+    @each $type, $color in vars.$type-colors {
       .#{$type} {
         background-color: $color;
       }
@@ -83,12 +83,12 @@
 
       .label {
         font-weight: 600;
-        color: #555;
+        color: vars.$color-muted;
       }
 
       .value {
         font-weight: 700;
-        color: #222;
+        color: vars.$color-text;
       }
     }
   }

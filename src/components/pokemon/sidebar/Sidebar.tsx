@@ -42,14 +42,13 @@ export default function Sidebar({
   };
   return (
     <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
-      <h2>Filter & Sort</h2>
       <div className="sidebar-content">
         {/* Clear All Button */}
         <div className="filter-clear-all">
           <button onClick={clearAllFilters}>Clear All Filters</button>
         </div>
 
-        <div className="filter-section">
+        <div className="filter-section search-input">
           <label>Search by name</label>
           <input
             type="text"

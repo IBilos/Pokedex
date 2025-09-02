@@ -10,29 +10,34 @@ export default function StatSlider({
   step = 1,
   onChange,
 }: StatSliderProps) {
-  const [localValues, setLocalValues] = useState(values);
+  const [dragValues, setDragValues] = useState(values);
   const [isDragging, setIsDragging] = useState(false);
-  const [minValue, maxValue] = localValues;
 
-  // Keep values constrained
+  // Sync dragValues when parent values change (like reset)
+  useEffect(() => {
+    if (!isDragging) {
+      setDragValues(values);
+    }
+  }, [values, isDragging]);
+
   const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = Math.min(Number(e.target.value), maxValue - step);
-    setLocalValues([Math.max(min, v), maxValue]);
+    const v = Math.min(Number(e.target.value), dragValues[1] - step);
+    setDragValues([Math.max(min, v), dragValues[1]]);
   };
 
   const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = Math.max(Number(e.target.value), minValue + step);
-    setLocalValues([minValue, Math.min(max, v)]);
+    const v = Math.max(Number(e.target.value), dragValues[0] + step);
+    setDragValues([dragValues[0], Math.min(max, v)]);
   };
 
   const handleDragStart = () => setIsDragging(true);
-  const handleDragEnd = () => setIsDragging(false);
 
-  useEffect(() => {
-    if (!isDragging) {
-      onChange(localValues);
-    }
-  }, [isDragging, localValues, onChange]);
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    onChange(dragValues);
+  };
+
+  const [minValue, maxValue] = dragValues;
 
   const total = max - min;
   const clampedMin = Math.max(min, Math.min(minValue, max));
@@ -51,7 +56,6 @@ export default function StatSlider({
           style={{ left: `${leftPercent}%`, width: `${rangePercent}%` }}
         />
 
-        {/* min thumb */}
         <input
           className="stat-slider__range stat-slider__range--min"
           type="range"
@@ -67,7 +71,6 @@ export default function StatSlider({
           aria-label={`${label ?? 'Range'} minimum`}
         />
 
-        {/* max thumb */}
         <input
           className="stat-slider__range stat-slider__range--max"
           type="range"

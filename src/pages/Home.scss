@@ -1,4 +1,6 @@
-html,body,#root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
 }
@@ -12,5 +14,9 @@ html,body,#root {
     display: flex;
     flex: 1;
     overflow: hidden;
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+    }
   }
 }

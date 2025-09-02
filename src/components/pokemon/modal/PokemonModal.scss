@@ -1,4 +1,4 @@
-@import '../../../styles/variables';
+@use '../../../styles/variables' as vars;
 
 .modal-overlay {
   position: fixed;
@@ -12,7 +12,7 @@
 }
 
 .modal-content {
-  background: #fff;
+  background: vars.$color-background;
   border-radius: 16px;
   padding: 1.5rem 2rem;
   width: 100%;
@@ -46,11 +46,11 @@
   background: transparent;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #444;
+  color: vars.$color-text;
   transition: color 0.2s ease;
 
   &:hover {
-    color: #000;
+    color: vars.$color-border-dark;
   }
 }
 
@@ -71,11 +71,12 @@
     margin: 0;
     font-size: 1.8rem;
     text-transform: capitalize;
+    color: vars.$color-text;
   }
 
   .pokemon-id {
     font-size: 0.9rem;
-    color: #666;
+    color: vars.$color-muted;
   }
 }
 
@@ -96,7 +97,7 @@
     text-align: center;
   }
 
-  @each $type, $color in $type-colors {
+  @each $type, $color in vars.$type-colors {
     .#{$type} {
       background-color: $color;
     }
@@ -136,6 +137,7 @@
         font-weight: 600;
         text-transform: capitalize;
         font-size: 0.85rem;
+        color: vars.$color-text;
       }
 
       .bar-container {
@@ -147,7 +149,7 @@
 
         .bar {
           height: 100%;
-          background: #4caf50;
+          background: vars.$color-accent;
           transition: width 0.3s ease;
         }
       }
@@ -155,7 +157,6 @@
   }
 }
 
-/* Responsive for small screens */
 @media (max-width: 480px) {
   .modal-content {
     padding: 1rem;

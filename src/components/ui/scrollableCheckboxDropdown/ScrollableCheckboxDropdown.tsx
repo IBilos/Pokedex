@@ -43,7 +43,10 @@ export default function ScrollableCheckboxDropdown({
 
   return (
     <div className={`checkbox-dropdown ${disabled ? 'disabled' : ''}`} ref={dropdownRef}>
-      <div className="dropdown-header" onClick={() => !disabled && setIsOpen((prev) => !prev)}>
+      <div
+        className={`dropdown-header ${isOpen ? 'focused' : ''}`}
+        onClick={() => !disabled && setIsOpen((prev) => !prev)}
+      >
         <span>{selected.length ? selected.join(', ') : placeholder}</span>
         <div className="actions">
           {selected.length > 0 && (

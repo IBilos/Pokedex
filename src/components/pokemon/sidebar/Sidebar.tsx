@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import './Sidebar.scss';
 import type { SidebarProps } from '../../../types/props';
 import ScrollableCheckboxDropdown from '../../ui/scrollableCheckboxDropdown/ScrollableCheckboxDropdown';
 import StatSlider from '../../ui/statSlider/StatSlider';
 import { STAT_LIMITS } from '../../../utils/constants';
 import SortDropdown from '../../ui/sortDropdown/SortDropdown';
+import { FiSearch } from 'react-icons/fi';
 
 export default function Sidebar({
   isOpen,
@@ -30,7 +32,20 @@ export default function Sidebar({
   sortCriteria,
   onSortCriteriaChange,
 }: SidebarProps) {
+  const [localSearch, setLocalSearch] = useState(search);
+
+  const handleSearch = () => {
+    onSearchChange(localSearch.trim());
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   const clearAllFilters = () => {
+    setLocalSearch('');
     onSearchChange('');
     onTypeChange([]);
     onGenerationChange([]);
@@ -40,6 +55,7 @@ export default function Sidebar({
     onSpeedChange([STAT_LIMITS.speed[0], STAT_LIMITS.speed[1]]);
     onSortCriteriaChange(null);
   };
+
   return (
     <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-content">
@@ -48,14 +64,21 @@ export default function Sidebar({
           <button onClick={clearAllFilters}>Clear All Filters</button>
         </div>
 
+        {/* Search Section */}
         <div className="filter-section search-input">
-          <label>Search by name</label>
-          <input
-            type="text"
-            placeholder="Search Pokémon"
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-          />
+          <label htmlFor="search">Search by name</label>
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <button onClick={handleSearch} className="search-button">
+              <FiSearch />
+            </button>
+          </div>
         </div>
 
         {/* Types */}

@@ -77,6 +77,13 @@ npm run lint
 npm run lint:fix
 ```
 
+5. **Testing:**
+
+```bash
+npm run test
+npm run test -- --watch
+```
+
 ---
 
 ## Live Demo

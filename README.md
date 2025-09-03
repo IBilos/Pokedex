@@ -47,7 +47,7 @@ A web application for exploring the Pokémon world, featuring advanced filtering
 - By generation
 - By individual stats
 
---
+---
 
 ## Installation and Setup
 
@@ -83,7 +83,7 @@ npm run lint:fix
 
 [Open Pokedex on Vercel](https://pokedex-application-3.vercel.app/)
 
---
+---
 
 ## Architecture Overview
 
@@ -93,7 +93,7 @@ The application separates concerns by:
 - Splitting components into domain-specific (`pokemon`) and generic (`ui`)
 - Keeping type safety with TypeScript across the codebase
 
---
+---
 
 ## Project Structure
 
@@ -106,14 +106,14 @@ The application separates concerns by:
 - `src/types` – Interfaces, types and pokeApi helpers  
 - `src/utils` – helper functions (stat calculations, sorting logic)
 
---
+---
 
 ## Testing
 Planned (or partially implemented):
 - Unit tests with Jest + React Testing Library
 - E2E tests with Cypress
 
---
+---
 
 ## Future Improvements
 

@@ -123,6 +123,10 @@ Planned (or partially implemented):
 - Extend filtering (height, weight, base experience)
 - Expand test coverage (unit, integration, E2E)
 
+---
 
+## Author
+
+Developed by [Ivan Biloš](https://github.com/IBilos)
 
 

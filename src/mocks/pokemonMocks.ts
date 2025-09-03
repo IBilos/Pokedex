@@ -1,4 +1,4 @@
-import type { PokemonListItem, PokemonDetails } from '../../types/pokemon';
+import type { PokemonListItem, PokemonDetails } from '../types/pokemon';
 
 export const mockPokemonList: PokemonListItem[] = [
   { name: 'mew', url: 'https://pokeapi.co/api/v2/pokemon/mew' },
